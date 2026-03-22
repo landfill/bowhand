@@ -76,12 +76,12 @@ export class Target {
       this.mesh.add(rightPost);
     }
 
-    // Glow ring (invisible by default, shown on hover/proximity)
-    const glowGeo = new THREE.TorusGeometry(r + 0.2, 0.04, 8, 32);
+    // AR glow ring — always slightly visible for AR visibility
+    const glowGeo = new THREE.TorusGeometry(r + 0.2, 0.06, 8, 32);
     const glowMat = new THREE.MeshBasicMaterial({
       color: 0x44aaff,
       transparent: true,
-      opacity: 0,
+      opacity: 0.2,
     });
     this.glowRing = new THREE.Mesh(glowGeo, glowMat);
     this.mesh.add(this.glowRing);
