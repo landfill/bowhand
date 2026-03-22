@@ -1,0 +1,28 @@
+{
+  "name": "bowhand",
+  "version": "0.1.0",
+  "description": "1st-person 3D archery game with camera-based hand tracking",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "threejs",
+    "mediapipe",
+    "hand-tracking",
+    "archery",
+    "3d-game"
+  ],
+  "author": "h0977",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "@types/three": "^0.183.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.1"
+  }
+}

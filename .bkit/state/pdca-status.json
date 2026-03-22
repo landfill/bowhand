@@ -1,0 +1,124 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-03-22T13:23:49.157Z",
+  "activeFeatures": [
+    "bowhand",
+    "scene",
+    "ui"
+  ],
+  "primaryFeature": "bowhand",
+  "features": {
+    "bowhand": {
+      "phase": "check",
+      "status": "completed",
+      "startedAt": "2026-03-22T13:00:00.000Z",
+      "matchRate": 98,
+      "iterationCount": 2,
+      "documents": {
+        "plan": "docs/01-plan/features/bowhand.plan.md",
+        "design": "docs/02-design/features/bowhand.design.md",
+        "analysis": "docs/03-analysis/bowhand.analysis.md"
+      },
+      "phaseNumber": 3,
+      "lastFile": "/Users/h0977/dev/bowhand/src/main.ts",
+      "timestamps": {
+        "lastUpdated": "2026-03-22T13:22:38.993Z"
+      }
+    },
+    "scene": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-22T13:22:22.160Z",
+        "lastUpdated": "2026-03-22T13:23:49.157Z"
+      },
+      "lastFile": "/Users/h0977/dev/bowhand/src/scene/Target.ts"
+    },
+    "ui": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-22T13:23:12.170Z",
+        "lastUpdated": "2026-03-22T13:23:12.170Z"
+      },
+      "lastFile": "/Users/h0977/dev/bowhand/src/ui/HUD.ts"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Starter",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-03-22T12:35:53.913Z",
+    "onboardingCompleted": true,
+    "lastActivity": "2026-03-22T13:23:49.157Z"
+  },
+  "history": [
+    {
+      "action": "plan-plus-completed",
+      "feature": "bowhand",
+      "timestamp": "2026-03-22T13:00:00.000Z"
+    },
+    {
+      "action": "design-completed",
+      "feature": "bowhand",
+      "timestamp": "2026-03-22T13:15:00.000Z"
+    },
+    {
+      "action": "do-completed",
+      "feature": "bowhand",
+      "timestamp": "2026-03-22T13:10:00.000Z"
+    },
+    {
+      "action": "check-completed",
+      "feature": "bowhand",
+      "matchRate": 89,
+      "timestamp": "2026-03-22T13:20:00.000Z"
+    },
+    {
+      "action": "iterate-1-completed",
+      "feature": "bowhand",
+      "matchRate": 95,
+      "timestamp": "2026-03-22T13:30:00.000Z"
+    },
+    {
+      "timestamp": "2026-03-22T13:22:22.160Z",
+      "feature": "scene",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-22T13:22:38.993Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-22T13:23:12.170Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-22T13:23:49.157Z",
+      "feature": "scene",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "action": "iterate-2-completed",
+      "feature": "bowhand",
+      "matchRate": 98,
+      "timestamp": "2026-03-22T14:00:00.000Z"
+    }
+  ]
+}

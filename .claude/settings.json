@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "bkit-starter@bkit-marketplace": true,
+    "bkit@bkit-marketplace": true
+  }
+}
