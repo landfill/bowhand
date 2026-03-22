@@ -3,7 +3,6 @@ import { CameraManager } from './camera/CameraManager';
 import { HandTracker } from './tracking/HandTracker';
 import { GestureEngine } from './tracking/GestureEngine';
 import { SceneManager } from './scene/SceneManager';
-import { FantasyField } from './scene/FantasyField';
 import { Target } from './scene/Target';
 import { AimController } from './gameplay/AimController';
 import { ArrowPhysics } from './gameplay/ArrowPhysics';
@@ -57,6 +56,16 @@ async function main(): Promise<void> {
     return;
   }
 
+  // --- Setup AR background & PiP ---
+  const arBg = document.getElementById('ar-background') as HTMLVideoElement;
+  const pipView = document.getElementById('pip-view') as HTMLVideoElement;
+
+  arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
+  arBg.play();
+
+  pipView.srcObject = cameraManager.getVideoElement().srcObject;
+  pipView.play();
+
   // --- Initialize Hand Tracker ---
   loadingText.textContent = 'Loading hand tracking model...';
   const handTracker = new HandTracker();
@@ -70,49 +79,58 @@ async function main(): Promise<void> {
     return;
   }
 
-  // --- Initialize 3D Scene ---
-  loadingText.textContent = 'Building fantasy world...';
+  // --- Initialize 3D Scene (AR overlay) ---
+  loadingText.textContent = 'Setting up AR targets...';
   const sceneManager = new SceneManager();
   sceneManager.init(app);
 
-  const fantasyField = new FantasyField();
-  fantasyField.init(sceneManager.getScene());
+  // AR lighting — needs to work with transparent background
+  const arLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  arLight.position.set(5, 10, 5);
+  sceneManager.getScene().add(arLight);
+  const arAmbient = new THREE.AmbientLight(0xffffff, 0.6);
+  sceneManager.getScene().add(arAmbient);
 
-  // --- Create Targets ---
+  // --- Create AR Targets ---
+  // Targets positioned in front of camera, floating in AR space
   const targetConfigs: TargetConfig[] = [
-    // Near row — easy
+    // Near — easy (large, slow)
     {
-      position: new THREE.Vector3(-4, 1.5, -12),
-      radius: 1.2,
-      type: 'static',
-    },
-    {
-      position: new THREE.Vector3(4, 1.8, -13),
-      radius: 1.0,
-      type: 'static',
-    },
-    // Mid row — medium (floating)
-    {
-      position: new THREE.Vector3(0, 3, -18),
-      radius: 1.0,
+      position: new THREE.Vector3(-2, 1.5, -8),
+      radius: 0.8,
       type: 'floating',
-      floatAmplitude: 0.6,
+      floatAmplitude: 0.3,
+      floatSpeed: 0.6,
+    },
+    {
+      position: new THREE.Vector3(2, 1.8, -9),
+      radius: 0.7,
+      type: 'floating',
+      floatAmplitude: 0.25,
       floatSpeed: 0.8,
     },
+    // Mid — medium
     {
-      position: new THREE.Vector3(-6, 2.5, -20),
-      radius: 0.9,
+      position: new THREE.Vector3(0, 2.5, -14),
+      radius: 0.6,
+      type: 'floating',
+      floatAmplitude: 0.5,
+      floatSpeed: 1.0,
+    },
+    {
+      position: new THREE.Vector3(-3, 2, -16),
+      radius: 0.5,
       type: 'floating',
       floatAmplitude: 0.4,
       floatSpeed: 1.2,
     },
-    // Far row — hard (smaller, faster)
+    // Far — hard (small, fast)
     {
-      position: new THREE.Vector3(5, 3.5, -25),
-      radius: 0.7,
+      position: new THREE.Vector3(3, 3, -20),
+      radius: 0.4,
       type: 'floating',
-      floatAmplitude: 0.8,
-      floatSpeed: 1.8,
+      floatAmplitude: 0.7,
+      floatSpeed: 1.6,
     },
   ];
 
@@ -219,10 +237,7 @@ async function main(): Promise<void> {
       target.update(delta);
     }
 
-    // 8. Update environment
-    fantasyField.update(delta);
-
-    // 9. Render
+    // 8. Render
     sceneManager.render();
   }
 

@@ -8,7 +8,7 @@ export class SceneManager {
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-    this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+    this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
   }
 
   init(container: HTMLElement): void {
@@ -24,7 +24,7 @@ export class SceneManager {
     // Renderer setup
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x87ceeb); // sky blue fallback
+    this.renderer.setClearColor(0x000000, 0); // transparent for AR passthrough
     this.renderer.shadowMap.enabled = false; // performance
     container.appendChild(this.renderer.domElement);
 
