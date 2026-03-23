@@ -197,6 +197,20 @@ async function main(): Promise<void> {
   // --- Hide loading, show game ---
   loadingEl.style.display = 'none';
 
+  // --- Debug overlay (for mobile diagnostics) ---
+  const debugEl = document.createElement('div');
+  debugEl.style.cssText = `
+    position: absolute; top: 8px; left: 8px; z-index: 30;
+    color: #0f0; font: 11px monospace; background: rgba(0,0,0,0.6);
+    padding: 4px 8px; border-radius: 4px; pointer-events: none;
+  `;
+  app.appendChild(debugEl);
+
+  const frontVid = cameraManager.getVideoElement();
+  let detectCount = 0;
+  let landmarkCount = 0;
+  let lastError = '';
+
   // --- Render Loop ---
   const clock = new THREE.Clock();
 
@@ -222,17 +236,27 @@ async function main(): Promise<void> {
       }
       frameCount = 0;
       fpsAccum = 0;
+
+      // Update debug overlay
+      const fps = Math.round(avgFps);
+      debugEl.textContent =
+        `${fps}fps vid:${frontVid.videoWidth}x${frontVid.videoHeight} rs:${frontVid.readyState} ` +
+        `det:${detectCount} lm:${landmarkCount} skip:${handTracker.getSkipInterval()}` +
+        (lastError ? ` ERR:${lastError}` : '');
     }
 
     // 1. Hand tracking
     handTracker
       .detect(cameraManager.getVideoElement())
       .then((landmarks) => {
+        detectCount++;
+
         // 2. Gesture recognition
         const gesture = gestureEngine.update(landmarks);
 
         // 3. Update aim
         if (landmarks) {
+          landmarkCount++;
           aimController.update(gesture.handPosition, sceneManager.getCamera());
         }
 
@@ -247,8 +271,8 @@ async function main(): Promise<void> {
         // 5. Update HUD state
         hud.updateState(gesture.state);
       })
-      .catch(() => {
-        // Silently handle tracking errors
+      .catch((err) => {
+        lastError = String(err).slice(0, 40);
       });
 
     // 6. Update arrow physics

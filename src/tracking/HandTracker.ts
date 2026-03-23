@@ -8,6 +8,11 @@ export class HandTracker {
   private frameSkip = 0;
   private skipInterval = 2;
 
+  // Canvas intermediate for mobile compatibility
+  // Avoids WebGL context conflicts between MediaPipe and Three.js
+  private detectCanvas: HTMLCanvasElement | null = null;
+  private detectCtx: CanvasRenderingContext2D | null = null;
+
   constructor() {
     this.hands = new Hands({
       locateFile: (file) =>
@@ -17,8 +22,8 @@ export class HandTracker {
     this.hands.setOptions({
       modelComplexity: 0,
       maxNumHands: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.5,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.4,
     });
 
     this.hands.onResults((results) => {
@@ -27,11 +32,21 @@ export class HandTracker {
   }
 
   async init(): Promise<void> {
+    // Use a larger canvas for warm-up to ensure full model initialization
     const canvas = document.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
+    canvas.width = 64;
+    canvas.height = 64;
     await this.hands.send({ image: canvas });
     this.isReady = true;
+  }
+
+  private ensureCanvas(w: number, h: number): void {
+    if (!this.detectCanvas || this.detectCanvas.width !== w || this.detectCanvas.height !== h) {
+      this.detectCanvas = document.createElement('canvas');
+      this.detectCanvas.width = w;
+      this.detectCanvas.height = h;
+      this.detectCtx = this.detectCanvas.getContext('2d');
+    }
   }
 
   async detect(video: HTMLVideoElement): Promise<HandLandmark[] | null> {
@@ -45,7 +60,13 @@ export class HandTracker {
       return this.extractLandmarks();
     }
 
-    await this.hands.send({ image: video });
+    // Draw video frame to 2D canvas first, then send canvas to MediaPipe.
+    // This avoids mobile issues where video→WebGL texture transfer fails
+    // when Three.js holds the primary WebGL context.
+    this.ensureCanvas(video.videoWidth, video.videoHeight);
+    this.detectCtx!.drawImage(video, 0, 0);
+
+    await this.hands.send({ image: this.detectCanvas! });
     return this.extractLandmarks();
   }
 
