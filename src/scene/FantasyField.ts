@@ -71,9 +71,12 @@ export class FantasyField {
     const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6b4226 });
 
     const treePositions = [
+      { x: 6, z: -15 },
+      { x: -6, z: -18 },
       { x: 10, z: -25 },
       { x: 15, z: -30 },
       { x: -10, z: -35 },
+      { x: -4, z: -12 },
       { x: 20, z: -20 },
       { x: -20, z: -28 },
       { x: 8, z: -40 },
