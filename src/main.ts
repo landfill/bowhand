@@ -106,43 +106,53 @@ async function main(): Promise<void> {
 
   // --- Create Targets ---
   const targetConfigs: TargetConfig[] = [
-    // Near — easy (large, slow)
+    // Near — easy (large, but notable sway)
     {
       position: new THREE.Vector3(-2, 1.5, -8),
       radius: 0.8,
       type: 'floating',
-      floatAmplitude: 0.3,
-      floatSpeed: 0.6,
+      floatAmplitude: 0.4,
+      floatSpeed: 1.0,
+      swayAmplitude: 0.9,
+      swaySpeed: 0.9,
     },
     {
       position: new THREE.Vector3(2, 1.8, -9),
       radius: 0.7,
       type: 'floating',
-      floatAmplitude: 0.25,
-      floatSpeed: 0.8,
+      floatAmplitude: 0.35,
+      floatSpeed: 1.2,
+      swayAmplitude: 1.1,
+      swaySpeed: 1.0,
     },
-    // Mid — medium
+    // Mid — medium (fast, wide sway)
     {
       position: new THREE.Vector3(0, 2.5, -14),
       radius: 0.6,
       type: 'floating',
-      floatAmplitude: 0.5,
-      floatSpeed: 1.0,
+      floatAmplitude: 0.6,
+      floatSpeed: 1.6,
+      swayAmplitude: 2.2,
+      swaySpeed: 1.4,
     },
     {
       position: new THREE.Vector3(-3, 2, -16),
       radius: 0.5,
       type: 'floating',
-      floatAmplitude: 0.4,
-      floatSpeed: 1.2,
+      floatAmplitude: 0.5,
+      floatSpeed: 1.8,
+      swayAmplitude: 2.5,
+      swaySpeed: 1.5,
     },
-    // Far — hard (small, fast)
+    // Far — hard (small, very fast, very wide sway — full power required)
     {
-      position: new THREE.Vector3(3, 3, -20),
+      position: new THREE.Vector3(3, 3, -22),
       radius: 0.4,
       type: 'floating',
-      floatAmplitude: 0.7,
-      floatSpeed: 1.6,
+      floatAmplitude: 0.8,
+      floatSpeed: 2.2,
+      swayAmplitude: 3.2,
+      swaySpeed: 2.0,
     },
   ];
 
