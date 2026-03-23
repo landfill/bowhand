@@ -4,22 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>BowHand</title>
+  <link rel="icon" href="data:,">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     #app { width: 100%; height: 100%; position: relative; }
-    #ar-background {
-      position: absolute; inset: 0; z-index: 0;
-      object-fit: cover; width: 100%; height: 100%;
-    }
-    #pip-view {
-      position: absolute; bottom: 16px; right: 16px; z-index: 20;
-      width: 120px; height: 90px; border-radius: 10px;
-      border: 2px solid rgba(255,255,255,0.3);
-      object-fit: cover; transform: scaleX(-1);
-      background: #222; opacity: 0.85;
-    }
     #app canvas { position: absolute; inset: 0; z-index: 1; }
+    /* Hidden video for MediaPipe input — must not use display:none */
+    #pip-view {
+      position: absolute; bottom: 0; right: 0; z-index: -1;
+      width: 1px; height: 1px; opacity: 0.01;
+      pointer-events: none;
+    }
     #loading {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
@@ -29,6 +25,14 @@
     }
     #loading h1 { font-size: 2rem; margin-bottom: 1rem; }
     #loading p { font-size: 1rem; opacity: 0.7; }
+    #start-btn {
+      margin-top: 1.5rem; padding: 1rem 2.5rem;
+      font-size: 1.2rem; font-weight: bold;
+      background: #e94560; color: #fff; border: none;
+      border-radius: 12px; cursor: pointer;
+      touch-action: manipulation;
+    }
+    #start-btn:active { background: #c73550; transform: scale(0.96); }
     .spinner {
       width: 40px; height: 40px; margin: 1rem;
       border: 4px solid rgba(255,255,255,0.2);
@@ -51,12 +55,11 @@
 </head>
 <body>
   <div id="app">
-    <video id="ar-background" playsinline autoplay muted></video>
     <video id="pip-view" playsinline autoplay muted></video>
     <div id="loading">
       <h1>BowHand</h1>
-      <div class="spinner"></div>
-      <p id="loading-text">Initializing...</p>
+      <button id="start-btn">START</button>
+      <p id="loading-text"></p>
     </div>
     <div id="error-screen">
       <h2 id="error-title">Error</h2>

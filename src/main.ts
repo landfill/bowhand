@@ -3,6 +3,7 @@ import { CameraManager } from './camera/CameraManager';
 import { HandTracker } from './tracking/HandTracker';
 import { GestureEngine } from './tracking/GestureEngine';
 import { SceneManager } from './scene/SceneManager';
+import { FantasyField } from './scene/FantasyField';
 import { Target } from './scene/Target';
 import { AimController } from './gameplay/AimController';
 import { ArrowPhysics } from './gameplay/ArrowPhysics';
@@ -13,6 +14,7 @@ import type { TargetConfig } from './types';
 const app = document.getElementById('app')!;
 const loadingEl = document.getElementById('loading')!;
 const loadingText = document.getElementById('loading-text')!;
+const startBtn = document.getElementById('start-btn') as HTMLButtonElement;
 const errorScreen = document.getElementById('error-screen')!;
 const errorTitle = document.getElementById('error-title')!;
 const errorMessage = document.getElementById('error-message')!;
@@ -23,6 +25,29 @@ function showError(title: string, message: string): void {
   errorTitle.textContent = title;
   errorMessage.textContent = message;
 }
+
+function showLoading(text: string): void {
+  startBtn.style.display = 'none';
+  loadingText.textContent = text;
+}
+
+// Gyroscope permission must be requested during user gesture (iOS 13+)
+let gyroPermissionGranted = false;
+
+startBtn.addEventListener('click', async () => {
+  if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+    try {
+      const perm = await (DeviceOrientationEvent as any).requestPermission();
+      gyroPermissionGranted = perm === 'granted';
+    } catch {
+      gyroPermissionGranted = false;
+    }
+  } else {
+    // Non-iOS: gyro available without permission
+    gyroPermissionGranted = true;
+  }
+  main();
+}, { once: true });
 
 async function main(): Promise<void> {
   // --- Check WebGL Support ---
@@ -36,9 +61,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  // --- Initialize Camera ---
-  loadingText.textContent = 'Requesting camera access...';
-  const cameraManager = new CameraManager();
+  // --- Initialize Camera (front only, for hand tracking) ---
+  showLoading('Requesting camera access...');
+  const pipView = document.getElementById('pip-view') as HTMLVideoElement;
+  const cameraManager = new CameraManager(pipView);
   try {
     await cameraManager.init();
   } catch (err) {
@@ -56,30 +82,8 @@ async function main(): Promise<void> {
     return;
   }
 
-  // --- Setup AR background & PiP ---
-  const arBg = document.getElementById('ar-background') as HTMLVideoElement;
-  const pipView = document.getElementById('pip-view') as HTMLVideoElement;
-
-  arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
-  arBg.muted = true;
-  try {
-    await arBg.play();
-  } catch {
-    showError(
-      'AR Video Error',
-      'Could not start camera background. Please reload the page or check browser settings.',
-    );
-    return;
-  }
-
-  pipView.srcObject = cameraManager.getVideoElement().srcObject;
-  pipView.muted = true;
-  await pipView.play().catch(() => {
-    // PiP is non-critical — silent fallback
-  });
-
   // --- Initialize Hand Tracker ---
-  loadingText.textContent = 'Loading hand tracking model...';
+  showLoading('Loading hand tracking model...');
   const handTracker = new HandTracker();
   try {
     await handTracker.init();
@@ -91,20 +95,16 @@ async function main(): Promise<void> {
     return;
   }
 
-  // --- Initialize 3D Scene (AR overlay) ---
-  loadingText.textContent = 'Setting up AR targets...';
+  // --- Initialize 3D Scene ---
+  showLoading('Setting up scene...');
   const sceneManager = new SceneManager();
   sceneManager.init(app);
 
-  // AR lighting — needs to work with transparent background
-  const arLight = new THREE.DirectionalLight(0xffffff, 1.0);
-  arLight.position.set(5, 10, 5);
-  sceneManager.getScene().add(arLight);
-  const arAmbient = new THREE.AmbientLight(0xffffff, 0.6);
-  sceneManager.getScene().add(arAmbient);
+  // --- Fantasy Field environment ---
+  const fantasyField = new FantasyField();
+  fantasyField.init(sceneManager.getScene());
 
-  // --- Create AR Targets ---
-  // Targets positioned in front of camera, floating in AR space
+  // --- Create Targets ---
   const targetConfigs: TargetConfig[] = [
     // Near — easy (large, slow)
     {
@@ -163,6 +163,38 @@ async function main(): Promise<void> {
   // --- Initialize HUD ---
   const hud = new HUD(app);
 
+  // --- Gyroscope Controls ---
+  // Device orientation → Three.js camera rotation for "AR feel"
+  // On PC (no gyro): camera stays at fixed position looking at targets
+  let gyroActive = false;
+
+  if (gyroPermissionGranted) {
+    const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+    const zee = new THREE.Vector3(0, 0, 1);
+
+    const onOrientation = (event: DeviceOrientationEvent): void => {
+      if (event.alpha === null) return;
+
+      const alpha = THREE.MathUtils.degToRad(event.alpha);
+      const beta = THREE.MathUtils.degToRad(event.beta!);
+      const gamma = THREE.MathUtils.degToRad(event.gamma!);
+      const orient = THREE.MathUtils.degToRad(
+        (screen.orientation?.angle ?? (window as any).orientation ?? 0) as number,
+      );
+
+      const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+      const q = new THREE.Quaternion();
+      q.setFromEuler(euler);
+      q.multiply(q1);
+      q.multiply(new THREE.Quaternion().setFromAxisAngle(zee, -orient));
+
+      sceneManager.getCamera().quaternion.copy(q);
+      gyroActive = true;
+    };
+
+    window.addEventListener('deviceorientation', onOrientation);
+  }
+
   // --- Event Handlers ---
   gestureEngine.addEventListener('release', ((e: CustomEvent) => {
     if (arrowPhysics.getIsFlying()) return;
@@ -175,7 +207,6 @@ async function main(): Promise<void> {
 
   arrowPhysics.addEventListener('hit', ((e: CustomEvent) => {
     hud.showHitFeedback();
-    // Reset hit target after delay
     const idx = e.detail.targetIndex;
     setTimeout(() => targets[idx].resetHit(), 1500);
   }) as EventListener);
@@ -187,13 +218,26 @@ async function main(): Promise<void> {
   // --- Hide loading, show game ---
   loadingEl.style.display = 'none';
 
+  // --- Debug overlay ---
+  const debugEl = document.createElement('div');
+  debugEl.style.cssText = `
+    position: absolute; top: 8px; left: 8px; z-index: 30;
+    color: #0f0; font: 11px monospace; background: rgba(0,0,0,0.6);
+    padding: 4px 8px; border-radius: 4px; pointer-events: none;
+  `;
+  app.appendChild(debugEl);
+
+  const frontVid = cameraManager.getVideoElement();
+  let detectCount = 0;
+  let landmarkCount = 0;
+  let lastError = '';
+
   // --- Render Loop ---
   const clock = new THREE.Clock();
 
-  // FPS monitoring for adaptive frame skip
   let frameCount = 0;
   let fpsAccum = 0;
-  const FPS_CHECK_INTERVAL = 60; // check every 60 frames
+  const FPS_CHECK_INTERVAL = 60;
   const LOW_FPS_THRESHOLD = 15;
 
   function gameLoop(): void {
@@ -212,21 +256,27 @@ async function main(): Promise<void> {
       }
       frameCount = 0;
       fpsAccum = 0;
+
+      const fps = Math.round(avgFps);
+      debugEl.textContent =
+        `${fps}fps vid:${frontVid.videoWidth}x${frontVid.videoHeight} rs:${frontVid.readyState} ` +
+        `det:${detectCount} lm:${landmarkCount} gyro:${gyroActive ? 'on' : 'off'}` +
+        (lastError ? ` ERR:${lastError}` : '');
     }
 
     // 1. Hand tracking
     handTracker
       .detect(cameraManager.getVideoElement())
       .then((landmarks) => {
-        // 2. Gesture recognition
+        detectCount++;
+
         const gesture = gestureEngine.update(landmarks);
 
-        // 3. Update aim
         if (landmarks) {
+          landmarkCount++;
           aimController.update(gesture.handPosition, sceneManager.getCamera());
         }
 
-        // 4. Update draw state visual
         if (gesture.state === 'DRAW') {
           aimController.setDrawState(gesture.drawPower);
           hud.updatePower(gesture.drawPower);
@@ -234,26 +284,26 @@ async function main(): Promise<void> {
           hud.updatePower(0);
         }
 
-        // 5. Update HUD state
         hud.updateState(gesture.state);
       })
-      .catch(() => {
-        // Silently handle tracking errors
+      .catch((err) => {
+        lastError = String(err).slice(0, 40);
       });
 
-    // 6. Update arrow physics
+    // 2. Arrow physics
     arrowPhysics.update(delta);
 
-    // 7. Update targets
+    // 3. Update targets
     for (const target of targets) {
       target.update(delta);
     }
 
-    // 8. Render
+    // 4. Update fantasy field (cloud animation)
+    fantasyField.update(delta);
+
+    // 5. Render
     sceneManager.render();
   }
 
   gameLoop();
 }
-
-main();
