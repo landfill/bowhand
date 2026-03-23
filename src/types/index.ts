@@ -29,6 +29,8 @@ export interface TargetConfig {
   type: 'static' | 'floating';
   floatAmplitude?: number;
   floatSpeed?: number;
+  swayAmplitude?: number; // horizontal sway width
+  swaySpeed?: number;     // horizontal sway speed multiplier
 }
 
 export interface HitResult {

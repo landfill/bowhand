@@ -90,15 +90,16 @@ export class Target {
   update(deltaTime: number): void {
     this.elapsed += deltaTime;
 
-    // Floating animation (enhanced: figure-8 path for floating targets)
+    // Floating animation
     if (this.config.type === 'floating') {
       const amp = this.config.floatAmplitude ?? 0.5;
       const speed = this.config.floatSpeed ?? 1.0;
+      const swayAmp = this.config.swayAmplitude ?? amp * 0.3;
+      const swaySpeed = this.config.swaySpeed ?? speed * 0.7;
       this.mesh.position.y = this.baseY + Math.sin(this.elapsed * speed) * amp;
-      // Subtle horizontal sway
-      this.mesh.position.x = this.baseX + Math.sin(this.elapsed * speed * 0.7) * amp * 0.3;
-      // Gentle tilt
-      this.mesh.rotation.z = Math.sin(this.elapsed * speed * 0.5) * 0.05;
+      this.mesh.position.x = this.baseX + Math.sin(this.elapsed * swaySpeed) * swayAmp;
+      // Tilt follows horizontal sway direction
+      this.mesh.rotation.z = Math.sin(this.elapsed * swaySpeed) * swayAmp * 0.15;
     }
 
     // Glow ring pulse

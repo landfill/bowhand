@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { Target } from '../scene/Target';
 
 const GRAVITY = -9.8;
-const BASE_SPEED = 25;
-const MAX_LIFETIME = 3; // seconds
+const BASE_SPEED = 14;
+const MAX_LIFETIME = 2.0; // seconds
 
 export class ArrowPhysics extends EventTarget {
   private scene: THREE.Scene | null = null;
