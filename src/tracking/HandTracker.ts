@@ -37,6 +37,9 @@ export class HandTracker {
   async detect(video: HTMLVideoElement): Promise<HandLandmark[] | null> {
     if (!this.isReady) return null;
 
+    // Skip if video not ready (mobile can be slow to deliver frames)
+    if (video.readyState < 2 || video.videoWidth === 0) return this.extractLandmarks();
+
     this.frameSkip++;
     if (this.frameSkip % this.skipInterval !== 0) {
       return this.extractLandmarks();

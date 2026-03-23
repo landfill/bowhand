@@ -19,7 +19,13 @@ export class CameraManager {
     video.setAttribute('playsinline', '');
     video.setAttribute('autoplay', '');
     video.muted = true;
-    video.style.display = 'none';
+    // Use offscreen positioning instead of display:none
+    // Some mobile browsers don't deliver frames for display:none videos
+    video.style.position = 'fixed';
+    video.style.top = '-9999px';
+    video.style.left = '-9999px';
+    video.style.width = '1px';
+    video.style.height = '1px';
     document.body.appendChild(video);
     return video;
   }
