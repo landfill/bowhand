@@ -57,26 +57,33 @@ async function main(): Promise<void> {
   }
 
   // --- Setup AR background & PiP ---
+  // Use HTML video elements directly with streams (avoid duplicate srcObject on mobile)
   const arBg = document.getElementById('ar-background') as HTMLVideoElement;
   const pipView = document.getElementById('pip-view') as HTMLVideoElement;
 
-  arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
-  arBg.muted = true;
-  try {
-    await arBg.play();
-  } catch {
-    showError(
-      'AR Video Error',
-      'Could not start camera background. Please reload the page or check browser settings.',
-    );
-    return;
+  const arStream = cameraManager.getARStream();
+  if (arStream) {
+    arBg.srcObject = arStream;
+    arBg.muted = true;
+    try {
+      await arBg.play();
+    } catch {
+      showError(
+        'AR Video Error',
+        'Could not start camera background. Please reload the page or check browser settings.',
+      );
+      return;
+    }
   }
 
-  pipView.srcObject = cameraManager.getVideoElement().srcObject;
-  pipView.muted = true;
-  await pipView.play().catch(() => {
-    // PiP is non-critical — silent fallback
-  });
+  const frontStream = cameraManager.getFrontStream();
+  if (frontStream) {
+    pipView.srcObject = frontStream;
+    pipView.muted = true;
+    await pipView.play().catch(() => {
+      // PiP is non-critical — silent fallback
+    });
+  }
 
   // --- Initialize Hand Tracker ---
   loadingText.textContent = 'Loading hand tracking model...';

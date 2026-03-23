@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-23T00:44:23.214Z",
+  "lastUpdated": "2026-03-23T01:44:24.261Z",
   "activeFeatures": [
     "bowhand",
     "scene",
@@ -24,7 +24,7 @@
       "phaseNumber": 3,
       "lastFile": "/Users/h0977/dev/bowhand/src/main.ts",
       "timestamps": {
-        "lastUpdated": "2026-03-23T00:44:23.214Z"
+        "lastUpdated": "2026-03-23T01:44:24.261Z"
       }
     },
     "scene": {
@@ -62,7 +62,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-22T14:22:45.646Z",
-        "lastUpdated": "2026-03-22T14:22:45.646Z"
+        "lastUpdated": "2026-03-23T01:44:09.886Z"
       },
       "lastFile": "/Users/h0977/dev/bowhand/src/camera/CameraManager.ts"
     }
@@ -75,7 +75,7 @@
   "session": {
     "startedAt": "2026-03-22T12:35:53.913Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-03-23T00:44:23.214Z"
+    "lastActivity": "2026-03-23T01:44:24.261Z"
   },
   "history": [
     {
@@ -191,6 +191,24 @@
     },
     {
       "timestamp": "2026-03-23T00:44:23.214Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T01:43:36.641Z",
+      "feature": "camera",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T01:44:09.886Z",
+      "feature": "camera",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T01:44:24.261Z",
       "feature": "bowhand",
       "phase": "do",
       "action": "updated"

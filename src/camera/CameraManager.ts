@@ -1,48 +1,31 @@
 export class CameraManager {
-  // Front camera — for hand tracking
+  // Front camera — for hand tracking (hidden, used by MediaPipe)
   private frontVideo: HTMLVideoElement;
   private frontStream: MediaStream | null = null;
 
   // Rear camera — for AR background
-  private rearVideo: HTMLVideoElement;
   private rearStream: MediaStream | null = null;
 
   private dualSupported = false;
 
   constructor() {
-    this.frontVideo = this.createVideoElement('front-cam');
-    this.rearVideo = this.createVideoElement('rear-cam');
+    // Front camera needs a hidden video for MediaPipe input
+    this.frontVideo = this.createHiddenVideo('front-cam');
   }
 
-  private createVideoElement(id: string): HTMLVideoElement {
+  private createHiddenVideo(id: string): HTMLVideoElement {
     const video = document.createElement('video');
     video.id = id;
     video.setAttribute('playsinline', '');
     video.setAttribute('autoplay', '');
+    video.muted = true;
     video.style.display = 'none';
     document.body.appendChild(video);
     return video;
   }
 
   async init(): Promise<void> {
-    // 1. Start rear camera (AR background) — higher resolution
-    try {
-      this.rearStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { exact: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
-      this.rearVideo.srcObject = this.rearStream;
-      await this.rearVideo.play();
-    } catch {
-      // Fallback: no rear camera (desktop) — use front camera for both
-      this.rearStream = null;
-    }
-
-    // 2. Start front camera (hand tracking)
+    // 1. Start front camera first (hand tracking — critical)
     try {
       this.frontStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -61,23 +44,39 @@ export class CameraManager {
       throw new Error('CAMERA_FAILED');
     }
 
-    this.dualSupported = this.rearStream !== null;
-
-    // If no rear camera, use front camera as AR background too
-    if (!this.dualSupported) {
-      this.rearVideo.srcObject = this.frontStream;
-      await this.rearVideo.play();
+    // 2. Try rear camera (AR background — optional)
+    // Many mobile devices cannot open two cameras simultaneously,
+    // so this is a best-effort attempt
+    try {
+      this.rearStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { exact: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+    } catch {
+      // Fallback: use front camera for AR background too
+      this.rearStream = null;
     }
+
+    this.dualSupported = this.rearStream !== null;
   }
 
-  /** Front camera video for hand tracking */
+  /** Front camera video for hand tracking (hidden element) */
   getVideoElement(): HTMLVideoElement {
     return this.frontVideo;
   }
 
-  /** Rear camera video for AR background */
-  getRearVideoElement(): HTMLVideoElement {
-    return this.rearVideo;
+  /** Get the AR background stream (rear or front fallback) */
+  getARStream(): MediaStream | null {
+    return this.rearStream ?? this.frontStream;
+  }
+
+  /** Get the front camera stream for PiP */
+  getFrontStream(): MediaStream | null {
+    return this.frontStream;
   }
 
   isDualCamera(): boolean {
@@ -91,13 +90,6 @@ export class CameraManager {
     };
   }
 
-  getRearVideoSize(): { width: number; height: number } {
-    return {
-      width: this.rearVideo.videoWidth || 1280,
-      height: this.rearVideo.videoHeight || 720,
-    };
-  }
-
   destroy(): void {
     if (this.frontStream) {
       this.frontStream.getTracks().forEach((track) => track.stop());
@@ -108,6 +100,5 @@ export class CameraManager {
       this.rearStream = null;
     }
     this.frontVideo.remove();
-    this.rearVideo.remove();
   }
 }
