@@ -61,10 +61,22 @@ async function main(): Promise<void> {
   const pipView = document.getElementById('pip-view') as HTMLVideoElement;
 
   arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
-  arBg.play();
+  arBg.muted = true;
+  try {
+    await arBg.play();
+  } catch {
+    showError(
+      'AR Video Error',
+      'Could not start camera background. Please reload the page or check browser settings.',
+    );
+    return;
+  }
 
   pipView.srcObject = cameraManager.getVideoElement().srcObject;
-  pipView.play();
+  pipView.muted = true;
+  await pipView.play().catch(() => {
+    // PiP is non-critical — silent fallback
+  });
 
   // --- Initialize Hand Tracker ---
   loadingText.textContent = 'Loading hand tracking model...';
