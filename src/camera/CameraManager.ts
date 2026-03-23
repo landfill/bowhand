@@ -62,8 +62,9 @@ export class CameraManager {
         },
         audio: false,
       });
-    } catch {
+    } catch (error) {
       // Fallback: use front camera for AR background too
+      console.warn('Rear camera unavailable, using front camera fallback:', error);
       this.rearStream = null;
     }
 
