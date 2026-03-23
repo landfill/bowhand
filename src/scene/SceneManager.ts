@@ -17,9 +17,7 @@ export class SceneManager {
 
     // Camera setup (1st person archer position)
     this.camera.aspect = width / height;
-    this.camera.position.set(0, 1.6, 0); // eye height ~1.6m
-    this.camera.lookAt(0, 1.6, -20);
-    this.camera.updateProjectionMatrix();
+    this.updateCameraForAspect(width, height);
 
     // Renderer setup
     this.renderer.setSize(width, height);
@@ -32,9 +30,20 @@ export class SceneManager {
       const w = container.clientWidth;
       const h = container.clientHeight;
       this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
+      this.updateCameraForAspect(w, h);
       this.renderer.setSize(w, h);
     });
+  }
+
+  private updateCameraForAspect(width: number, height: number): void {
+    const isPortrait = height > width;
+    // Portrait: widen FOV so horizontal view isn't too narrow
+    this.camera.fov = isPortrait ? 75 : 60;
+    this.camera.position.set(0, 1.6, 0);
+    // Portrait: look slightly higher to show more sky, less ground
+    const lookY = isPortrait ? 1.8 : 1.6;
+    this.camera.lookAt(0, lookY, -20);
+    this.camera.updateProjectionMatrix();
   }
 
   render(): void {
