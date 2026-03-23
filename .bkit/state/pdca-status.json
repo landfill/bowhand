@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-23T00:03:30.693Z",
+  "lastUpdated": "2026-03-23T00:44:23.214Z",
   "activeFeatures": [
     "bowhand",
     "scene",
@@ -10,7 +10,7 @@
   "primaryFeature": "bowhand",
   "features": {
     "bowhand": {
-      "phase": "completed",
+      "phase": "do",
       "status": "completed",
       "startedAt": "2026-03-22T13:00:00.000Z",
       "matchRate": 96,
@@ -24,7 +24,7 @@
       "phaseNumber": 3,
       "lastFile": "/Users/h0977/dev/bowhand/src/main.ts",
       "timestamps": {
-        "lastUpdated": "2026-03-23T00:03:30.693Z"
+        "lastUpdated": "2026-03-23T00:44:23.214Z"
       }
     },
     "scene": {
@@ -75,7 +75,7 @@
   "session": {
     "startedAt": "2026-03-22T12:35:53.913Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-03-23T00:03:30.693Z"
+    "lastActivity": "2026-03-23T00:44:23.214Z"
   },
   "history": [
     {
@@ -185,6 +185,12 @@
     },
     {
       "timestamp": "2026-03-23T00:03:30.693Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T00:44:23.214Z",
       "feature": "bowhand",
       "phase": "do",
       "action": "updated"

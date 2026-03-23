@@ -62,15 +62,20 @@ async function main(): Promise<void> {
 
   arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
   arBg.muted = true;
-  await arBg.play().catch(() => {
-    // iOS Safari requires muted + playsinline for autoplay
-    console.warn('AR background autoplay blocked');
-  });
+  try {
+    await arBg.play();
+  } catch {
+    showError(
+      'AR Video Error',
+      'Could not start camera background. Please reload the page or check browser settings.',
+    );
+    return;
+  }
 
   pipView.srcObject = cameraManager.getVideoElement().srcObject;
   pipView.muted = true;
   await pipView.play().catch(() => {
-    console.warn('PiP view autoplay blocked');
+    // PiP is non-critical — silent fallback
   });
 
   // --- Initialize Hand Tracker ---
