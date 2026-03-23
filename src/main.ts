@@ -61,10 +61,17 @@ async function main(): Promise<void> {
   const pipView = document.getElementById('pip-view') as HTMLVideoElement;
 
   arBg.srcObject = cameraManager.getRearVideoElement().srcObject;
-  arBg.play();
+  arBg.muted = true;
+  await arBg.play().catch(() => {
+    // iOS Safari requires muted + playsinline for autoplay
+    console.warn('AR background autoplay blocked');
+  });
 
   pipView.srcObject = cameraManager.getVideoElement().srcObject;
-  pipView.play();
+  pipView.muted = true;
+  await pipView.play().catch(() => {
+    console.warn('PiP view autoplay blocked');
+  });
 
   // --- Initialize Hand Tracker ---
   loadingText.textContent = 'Loading hand tracking model...';
