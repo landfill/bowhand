@@ -30,6 +30,14 @@
     }
     #loading h1 { font-size: 2rem; margin-bottom: 1rem; }
     #loading p { font-size: 1rem; opacity: 0.7; }
+    #start-btn {
+      margin-top: 1.5rem; padding: 1rem 2.5rem;
+      font-size: 1.2rem; font-weight: bold;
+      background: #e94560; color: #fff; border: none;
+      border-radius: 12px; cursor: pointer;
+      touch-action: manipulation;
+    }
+    #start-btn:active { background: #c73550; transform: scale(0.96); }
     .spinner {
       width: 40px; height: 40px; margin: 1rem;
       border: 4px solid rgba(255,255,255,0.2);
@@ -56,8 +64,8 @@
     <video id="pip-view" playsinline autoplay muted></video>
     <div id="loading">
       <h1>BowHand</h1>
-      <div class="spinner"></div>
-      <p id="loading-text">Initializing...</p>
+      <button id="start-btn">START</button>
+      <p id="loading-text"></p>
     </div>
     <div id="error-screen">
       <h2 id="error-title">Error</h2>

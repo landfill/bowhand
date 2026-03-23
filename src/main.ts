@@ -13,6 +13,7 @@ import type { TargetConfig } from './types';
 const app = document.getElementById('app')!;
 const loadingEl = document.getElementById('loading')!;
 const loadingText = document.getElementById('loading-text')!;
+const startBtn = document.getElementById('start-btn') as HTMLButtonElement;
 const errorScreen = document.getElementById('error-screen')!;
 const errorTitle = document.getElementById('error-title')!;
 const errorMessage = document.getElementById('error-message')!;
@@ -23,6 +24,16 @@ function showError(title: string, message: string): void {
   errorTitle.textContent = title;
   errorMessage.textContent = message;
 }
+
+function showLoading(text: string): void {
+  startBtn.style.display = 'none';
+  loadingText.textContent = text;
+}
+
+// Wait for user tap before requesting camera (required on mobile)
+startBtn.addEventListener('click', () => {
+  main();
+}, { once: true });
 
 async function main(): Promise<void> {
   // --- Check WebGL Support ---
@@ -37,7 +48,7 @@ async function main(): Promise<void> {
   }
 
   // --- Initialize Camera ---
-  loadingText.textContent = 'Requesting camera access...';
+  showLoading('Requesting camera access...');
   const cameraManager = new CameraManager();
   try {
     await cameraManager.init();
@@ -86,7 +97,7 @@ async function main(): Promise<void> {
   }
 
   // --- Initialize Hand Tracker ---
-  loadingText.textContent = 'Loading hand tracking model...';
+  showLoading('Loading hand tracking model...');
   const handTracker = new HandTracker();
   try {
     await handTracker.init();
@@ -99,7 +110,7 @@ async function main(): Promise<void> {
   }
 
   // --- Initialize 3D Scene (AR overlay) ---
-  loadingText.textContent = 'Setting up AR targets...';
+  showLoading('Setting up AR targets...');
   const sceneManager = new SceneManager();
   sceneManager.init(app);
 
@@ -262,5 +273,3 @@ async function main(): Promise<void> {
 
   gameLoop();
 }
-
-main();
