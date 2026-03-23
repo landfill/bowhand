@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>BowHand</title>
+  <meta name="description" content="손동작으로 활을 쏘는 AR 양궁 시뮬레이션. 카메라 핸드트래킹으로 시위를 당기고 화살을 날려보세요." />
+  <title>BowHand — Hand Tracking Archery</title>
   <link rel="icon" href="data:,">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     #app { width: 100%; height: 100%; position: relative; }
     #app canvas { position: absolute; inset: 0; z-index: 1; }
-    /* Hidden video for MediaPipe input — must not use display:none */
     #pip-view {
       position: absolute; bottom: 0; right: 0; z-index: -1;
       width: 1px; height: 1px; opacity: 0.01;
@@ -20,19 +20,64 @@
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      background: #1a1a2e; color: #e0e0e0;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(76,175,80,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(233,69,96,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0d1117 0%, #1a1a2e 40%, #16213e 100%);
+      color: #e0e0e0;
       font-family: system-ui, sans-serif; z-index: 100;
+      padding: 2rem;
+      text-align: center;
     }
-    #loading h1 { font-size: 2rem; margin-bottom: 1rem; }
-    #loading p { font-size: 1rem; opacity: 0.7; }
+    #loading h1 {
+      font-size: 2.5rem; margin-bottom: 0.3rem;
+      font-weight: 800; letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #fff 0%, #a0c4ff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #loading .subtitle {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em;
+      color: rgba(255,255,255,0.4); margin-bottom: 1.5rem;
+    }
+    #loading .tagline {
+      font-size: 1rem; color: rgba(255,255,255,0.7);
+      max-width: 280px; line-height: 1.5; margin-bottom: 2rem;
+    }
     #start-btn {
-      margin-top: 1.5rem; padding: 1rem 2.5rem;
-      font-size: 1.2rem; font-weight: bold;
-      background: #e94560; color: #fff; border: none;
-      border-radius: 12px; cursor: pointer;
+      padding: 1rem 3rem;
+      font-size: 1.3rem; font-weight: 800; letter-spacing: 0.1em;
+      background: linear-gradient(135deg, #e94560, #c73550);
+      color: #fff; border: none;
+      border-radius: 14px; cursor: pointer;
       touch-action: manipulation;
+      box-shadow: 0 4px 24px rgba(233,69,96,0.4);
+      transition: transform 0.1s;
     }
     #start-btn:active { background: #c73550; transform: scale(0.96); }
+    .gesture-guide {
+      display: flex; gap: 2rem;
+      margin-top: 2.5rem; padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .gesture-item {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .gesture-icon {
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; font-size: 1.5rem;
+    }
+    .gesture-label { text-align: left; }
+    .gesture-label .action {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.35);
+    }
+    .gesture-label .desc {
+      font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.85);
+    }
+    #loading p { font-size: 0.85rem; opacity: 0.5; margin-top: 1.5rem; }
     .spinner {
       width: 40px; height: 40px; margin: 1rem;
       border: 4px solid rgba(255,255,255,0.2);
@@ -58,7 +103,25 @@
     <video id="pip-view" playsinline autoplay muted></video>
     <div id="loading">
       <h1>BowHand</h1>
-      <button id="start-btn">START</button>
+      <div class="subtitle">Hand Tracking Archery</div>
+      <p class="tagline">카메라에 손을 보여주세요.<br>주먹으로 시위를 당기고, 손을 펴서 화살을 쏩니다.</p>
+      <button id="start-btn">PLAY</button>
+      <div class="gesture-guide">
+        <div class="gesture-item">
+          <div class="gesture-icon">&#9994;</div>
+          <div class="gesture-label">
+            <div class="action">Draw</div>
+            <div class="desc">주먹 = 당기기</div>
+          </div>
+        </div>
+        <div class="gesture-item">
+          <div class="gesture-icon">&#9995;</div>
+          <div class="gesture-label">
+            <div class="action">Shoot</div>
+            <div class="desc">펴기 = 발사</div>
+          </div>
+        </div>
+      </div>
       <p id="loading-text"></p>
     </div>
     <div id="error-screen">
