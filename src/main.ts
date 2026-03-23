@@ -48,8 +48,13 @@ async function main(): Promise<void> {
   }
 
   // --- Initialize Camera ---
+  // pip-view serves double duty: PiP display AND MediaPipe input
+  // This avoids assigning one stream to multiple videos (breaks on mobile)
   showLoading('Requesting camera access...');
-  const cameraManager = new CameraManager();
+  const arBg = document.getElementById('ar-background') as HTMLVideoElement;
+  const pipView = document.getElementById('pip-view') as HTMLVideoElement;
+
+  const cameraManager = new CameraManager(pipView);
   try {
     await cameraManager.init();
   } catch (err) {
@@ -67,11 +72,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  // --- Setup AR background & PiP ---
-  // Use HTML video elements directly with streams (avoid duplicate srcObject on mobile)
-  const arBg = document.getElementById('ar-background') as HTMLVideoElement;
-  const pipView = document.getElementById('pip-view') as HTMLVideoElement;
-
+  // --- Setup AR background ---
   const arStream = cameraManager.getARStream();
   if (arStream) {
     arBg.srcObject = arStream;
@@ -85,15 +86,6 @@ async function main(): Promise<void> {
       );
       return;
     }
-  }
-
-  const frontStream = cameraManager.getFrontStream();
-  if (frontStream) {
-    pipView.srcObject = frontStream;
-    pipView.muted = true;
-    await pipView.play().catch(() => {
-      // PiP is non-critical — silent fallback
-    });
   }
 
   // --- Initialize Hand Tracker ---

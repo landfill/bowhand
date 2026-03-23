@@ -1,5 +1,6 @@
 export class CameraManager {
-  // Front camera — for hand tracking (hidden, used by MediaPipe)
+  // Front camera video — used by both MediaPipe and PiP display
+  // Single video element avoids mobile stream duplication issues
   private frontVideo: HTMLVideoElement;
   private frontStream: MediaStream | null = null;
 
@@ -8,26 +9,8 @@ export class CameraManager {
 
   private dualSupported = false;
 
-  constructor() {
-    // Front camera needs a hidden video for MediaPipe input
-    this.frontVideo = this.createHiddenVideo('front-cam');
-  }
-
-  private createHiddenVideo(id: string): HTMLVideoElement {
-    const video = document.createElement('video');
-    video.id = id;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('autoplay', '');
-    video.muted = true;
-    // Use offscreen positioning instead of display:none
-    // Some mobile browsers don't deliver frames for display:none videos
-    video.style.position = 'fixed';
-    video.style.top = '-9999px';
-    video.style.left = '-9999px';
-    video.style.width = '1px';
-    video.style.height = '1px';
-    document.body.appendChild(video);
-    return video;
+  constructor(frontVideoEl: HTMLVideoElement) {
+    this.frontVideo = frontVideoEl;
   }
 
   async init(): Promise<void> {
@@ -42,6 +25,7 @@ export class CameraManager {
         audio: false,
       });
       this.frontVideo.srcObject = this.frontStream;
+      this.frontVideo.muted = true;
       await this.frontVideo.play();
     } catch (err) {
       if (err instanceof DOMException && err.name === 'NotAllowedError') {
@@ -51,8 +35,7 @@ export class CameraManager {
     }
 
     // 2. Try rear camera (AR background — optional)
-    // Many mobile devices cannot open two cameras simultaneously,
-    // so this is a best-effort attempt
+    // Many mobile devices cannot open two cameras simultaneously
     try {
       this.rearStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -63,7 +46,6 @@ export class CameraManager {
         audio: false,
       });
     } catch (error) {
-      // Fallback: use front camera for AR background too
       console.warn('Rear camera unavailable, using front camera fallback:', error);
       this.rearStream = null;
     }
@@ -71,19 +53,14 @@ export class CameraManager {
     this.dualSupported = this.rearStream !== null;
   }
 
-  /** Front camera video for hand tracking (hidden element) */
+  /** Front camera video element — for MediaPipe hand tracking input */
   getVideoElement(): HTMLVideoElement {
     return this.frontVideo;
   }
 
-  /** Get the AR background stream (rear or front fallback) */
+  /** AR background stream (rear camera, or front as fallback) */
   getARStream(): MediaStream | null {
     return this.rearStream ?? this.frontStream;
-  }
-
-  /** Get the front camera stream for PiP */
-  getFrontStream(): MediaStream | null {
-    return this.frontStream;
   }
 
   isDualCamera(): boolean {
@@ -106,6 +83,5 @@ export class CameraManager {
       this.rearStream.getTracks().forEach((track) => track.stop());
       this.rearStream = null;
     }
-    this.frontVideo.remove();
   }
 }
