@@ -1,12 +1,13 @@
 {
-  "version": "2.0",
-  "lastUpdated": "2026-03-23T02:10:52.708Z",
+  "version": "3.0",
+  "lastUpdated": "2026-03-26T13:53:17.021Z",
   "activeFeatures": [
     "bowhand",
     "scene",
     "ui",
     "camera",
-    "tracking"
+    "tracking",
+    "gameplay"
   ],
   "primaryFeature": "bowhand",
   "features": {
@@ -23,10 +24,27 @@
         "report": "docs/04-report/features/bowhand.report.md"
       },
       "phaseNumber": 3,
-      "lastFile": "/Users/h0977/dev/bowhand/src/main.ts",
+      "lastFile": "C:\\Users\\surro\\Toy\\bowhand\\src\\main.ts",
       "timestamps": {
-        "lastUpdated": "2026-03-23T01:59:01.525Z"
-      }
+        "lastUpdated": "2026-03-26T13:53:17.021Z"
+      },
+      "stateMachine": {
+        "currentState": "do",
+        "previousState": null,
+        "stateHistory": [],
+        "retryCount": 0,
+        "maxRetries": 5,
+        "circuitBreakerOpen": false
+      },
+      "metrics": {
+        "qualityScore": null,
+        "conventionCompliance": null,
+        "apiCompliance": null,
+        "cycleTimeMs": null,
+        "iterationEfficiency": null
+      },
+      "phaseTimestamps": {},
+      "automationLevel": 2
     },
     "scene": {
       "phase": "do",
@@ -37,9 +55,26 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-22T13:22:22.160Z",
-        "lastUpdated": "2026-03-22T14:24:05.715Z"
+        "lastUpdated": "2026-03-26T13:52:03.860Z"
       },
-      "lastFile": "/Users/h0977/dev/bowhand/src/scene/Target.ts"
+      "lastFile": "C:\\Users\\surro\\Toy\\bowhand\\src\\scene\\FantasyField.ts",
+      "stateMachine": {
+        "currentState": "do",
+        "previousState": null,
+        "stateHistory": [],
+        "retryCount": 0,
+        "maxRetries": 5,
+        "circuitBreakerOpen": false
+      },
+      "metrics": {
+        "qualityScore": null,
+        "conventionCompliance": null,
+        "apiCompliance": null,
+        "cycleTimeMs": null,
+        "iterationEfficiency": null
+      },
+      "phaseTimestamps": {},
+      "automationLevel": 2
     },
     "ui": {
       "phase": "do",
@@ -52,7 +87,24 @@
         "started": "2026-03-22T13:23:12.170Z",
         "lastUpdated": "2026-03-22T13:23:12.170Z"
       },
-      "lastFile": "/Users/h0977/dev/bowhand/src/ui/HUD.ts"
+      "lastFile": "/Users/h0977/dev/bowhand/src/ui/HUD.ts",
+      "stateMachine": {
+        "currentState": "do",
+        "previousState": null,
+        "stateHistory": [],
+        "retryCount": 0,
+        "maxRetries": 5,
+        "circuitBreakerOpen": false
+      },
+      "metrics": {
+        "qualityScore": null,
+        "conventionCompliance": null,
+        "apiCompliance": null,
+        "cycleTimeMs": null,
+        "iterationEfficiency": null
+      },
+      "phaseTimestamps": {},
+      "automationLevel": 2
     },
     "camera": {
       "phase": "do",
@@ -65,7 +117,24 @@
         "started": "2026-03-22T14:22:45.646Z",
         "lastUpdated": "2026-03-23T02:10:43.457Z"
       },
-      "lastFile": "/Users/h0977/dev/bowhand/src/camera/CameraManager.ts"
+      "lastFile": "/Users/h0977/dev/bowhand/src/camera/CameraManager.ts",
+      "stateMachine": {
+        "currentState": "do",
+        "previousState": null,
+        "stateHistory": [],
+        "retryCount": 0,
+        "maxRetries": 5,
+        "circuitBreakerOpen": false
+      },
+      "metrics": {
+        "qualityScore": null,
+        "conventionCompliance": null,
+        "apiCompliance": null,
+        "cycleTimeMs": null,
+        "iterationEfficiency": null
+      },
+      "phaseTimestamps": {},
+      "automationLevel": 2
     },
     "tracking": {
       "phase": "do",
@@ -78,7 +147,37 @@
         "started": "2026-03-23T02:10:52.708Z",
         "lastUpdated": "2026-03-23T02:10:52.708Z"
       },
-      "lastFile": "/Users/h0977/dev/bowhand/src/tracking/HandTracker.ts"
+      "lastFile": "/Users/h0977/dev/bowhand/src/tracking/HandTracker.ts",
+      "stateMachine": {
+        "currentState": "do",
+        "previousState": null,
+        "stateHistory": [],
+        "retryCount": 0,
+        "maxRetries": 5,
+        "circuitBreakerOpen": false
+      },
+      "metrics": {
+        "qualityScore": null,
+        "conventionCompliance": null,
+        "apiCompliance": null,
+        "cycleTimeMs": null,
+        "iterationEfficiency": null
+      },
+      "phaseTimestamps": {},
+      "automationLevel": 2
+    },
+    "gameplay": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-23T15:10:20.442Z",
+        "lastUpdated": "2026-03-23T15:26:22.183Z"
+      },
+      "lastFile": "C:\\Users\\surro\\Toy\\bowhand\\src\\gameplay\\ArrowPhysics.ts"
     }
   },
   "pipeline": {
@@ -89,7 +188,7 @@
   "session": {
     "startedAt": "2026-03-22T12:35:53.913Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-03-23T02:10:52.708Z"
+    "lastActivity": "2026-03-26T13:53:17.021Z"
   },
   "history": [
     {
@@ -262,6 +361,76 @@
       "feature": "tracking",
       "phase": "do",
       "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:10:20.442Z",
+      "feature": "gameplay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:10:26.951Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:10:36.685Z",
+      "feature": "scene",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:10:49.619Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:26:22.183Z",
+      "feature": "gameplay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-23T15:26:38.969Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-26T13:50:29.215Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-26T13:52:03.860Z",
+      "feature": "scene",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-26T13:53:17.021Z",
+      "feature": "bowhand",
+      "phase": "do",
+      "action": "updated"
     }
-  ]
+  ],
+  "stateMachine": {
+    "defaultWorkflow": "default",
+    "activeWorkflows": {},
+    "totalTransitions": 0
+  },
+  "automation": {
+    "globalLevel": 2,
+    "trustScore": 40,
+    "pendingApprovals": 0,
+    "lastGateResult": null
+  },
+  "team": {
+    "enabled": true,
+    "stateFile": ".bkit/runtime/agent-state.json",
+    "eventsFile": ".bkit/runtime/agent-events.jsonl"
+  }
 }

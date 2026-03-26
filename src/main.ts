@@ -106,53 +106,92 @@ async function main(): Promise<void> {
 
   // --- Create Targets ---
   const targetConfigs: TargetConfig[] = [
-    // Near — easy (large, but notable sway)
+    // --- Target Pumpkins (+10) ---
     {
-      position: new THREE.Vector3(-2, 1.5, -8),
+      position: new THREE.Vector3(-4.5, 1.0, -8),
       radius: 0.8,
       type: 'floating',
-      floatAmplitude: 0.4,
+      floatAmplitude: 0.6,
       floatSpeed: 1.0,
-      swayAmplitude: 0.9,
+      swayAmplitude: 2.5,
       swaySpeed: 0.9,
     },
     {
-      position: new THREE.Vector3(2, 1.8, -9),
+      position: new THREE.Vector3(5.0, 3.5, -10),
       radius: 0.7,
       type: 'floating',
-      floatAmplitude: 0.35,
+      floatAmplitude: 0.8,
       floatSpeed: 1.2,
-      swayAmplitude: 1.1,
+      swayAmplitude: 3.0,
       swaySpeed: 1.0,
     },
-    // Mid — medium (fast, wide sway)
     {
-      position: new THREE.Vector3(0, 2.5, -14),
+      position: new THREE.Vector3(-2.0, 4.5, -14),
       radius: 0.6,
       type: 'floating',
-      floatAmplitude: 0.6,
+      floatAmplitude: 1.2,
       floatSpeed: 1.6,
-      swayAmplitude: 2.2,
+      swayAmplitude: 3.5,
       swaySpeed: 1.4,
     },
     {
-      position: new THREE.Vector3(-3, 2, -16),
-      radius: 0.5,
+      position: new THREE.Vector3(-6.0, 2.5, -16),
+      radius: 0.65,
       type: 'floating',
-      floatAmplitude: 0.5,
+      floatAmplitude: 1.0,
       floatSpeed: 1.8,
-      swayAmplitude: 2.5,
+      swayAmplitude: 4.0,
       swaySpeed: 1.5,
     },
-    // Far — hard (small, very fast, very wide sway — full power required)
     {
-      position: new THREE.Vector3(3, 3, -22),
-      radius: 0.4,
+      position: new THREE.Vector3(6.0, 4.0, -20),
+      radius: 0.6,
       type: 'floating',
-      floatAmplitude: 0.8,
+      floatAmplitude: 1.5,
       floatSpeed: 2.2,
-      swayAmplitude: 3.2,
+      swayAmplitude: 5.0,
       swaySpeed: 2.0,
+    },
+    {
+      position: new THREE.Vector3(-3.0, 1.5, -22),
+      radius: 0.75,
+      type: 'floating',
+      floatAmplitude: 1.4,
+      floatSpeed: 1.5,
+      swayAmplitude: 4.5,
+      swaySpeed: 1.8,
+    },
+    
+    // --- Penalty Targets (Villagers, -10) ---
+    {
+      position: new THREE.Vector3(0, 5.0, -12),
+      radius: 0.6,
+      type: 'floating',
+      isPenalty: true,
+      floatAmplitude: 1.5,
+      floatSpeed: 2.5,
+      swayAmplitude: 4.5,
+      swaySpeed: 2.0,
+    },
+    {
+      position: new THREE.Vector3(4.5, 0.5, -18),
+      radius: 0.6,
+      type: 'floating',
+      isPenalty: true,
+      floatAmplitude: 1.0,
+      floatSpeed: 2.0,
+      swayAmplitude: 4.0,
+      swaySpeed: 1.8,
+    },
+    {
+      position: new THREE.Vector3(-5.0, 4.0, -15),
+      radius: 0.65,
+      type: 'floating',
+      isPenalty: true,
+      floatAmplitude: 1.2,
+      floatSpeed: 1.6,
+      swayAmplitude: 3.5,
+      swaySpeed: 2.2,
     },
   ];
 
@@ -216,9 +255,18 @@ async function main(): Promise<void> {
   }) as EventListener);
 
   arrowPhysics.addEventListener('hit', ((e: CustomEvent) => {
-    hud.showHitFeedback();
-    const idx = e.detail.targetIndex;
-    setTimeout(() => targets[idx].resetHit(), 1500);
+    hud.showHitFeedback(e.detail.isPenalty);
+
+    // Check if all active targets (Pumpkins) are destroyed
+    const allTargetsDestroyed = targets
+      .filter((t) => !t.getConfig().isPenalty)
+      .every((t) => !t.getActive());
+
+    if (allTargetsDestroyed) {
+      setTimeout(() => {
+        targets.forEach((t) => t.resetStatus());
+      }, 1500); // 1.5 second delay before respawn
+    }
   }) as EventListener);
 
   arrowPhysics.addEventListener('miss', () => {

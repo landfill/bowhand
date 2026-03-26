@@ -17,6 +17,7 @@ export class HUD {
   private feedbackTimer = 0;
   private hitCount = 0;
   private shotCount = 0;
+  private score = 0;
   private scoreDisplay!: HTMLElement;
 
   constructor(container: HTMLElement) {
@@ -115,17 +116,30 @@ export class HUD {
     this.stateText.textContent = STATE_MESSAGES[state];
   }
 
-  showHitFeedback(): void {
-    this.hitCount++;
+  showHitFeedback(isPenalty?: boolean): void {
     this.shotCount++;
-    this.updateScoreDisplay();
+    
+    if (isPenalty) {
+      this.score = Math.max(0, this.score - 10);
+      this.updateScoreDisplay();
 
-    this.feedbackText.textContent = 'HIT!';
-    this.feedbackText.style.color = '#ffd700';
-    this.feedbackText.style.textShadow =
-      '0 2px 12px rgba(0,0,0,0.8), 0 0 60px rgba(255,200,0,0.5)';
+      this.feedbackText.textContent = '-10';
+      this.feedbackText.style.color = '#ff3333';
+      this.feedbackText.style.textShadow =
+        '0 2px 12px rgba(0,0,0,0.8), 0 0 60px rgba(255,0,0,0.5)';
+    } else {
+      this.hitCount++;
+      this.score += 10;
+      this.updateScoreDisplay();
+
+      this.feedbackText.textContent = '+10';
+      this.feedbackText.style.color = '#44ddaa';
+      this.feedbackText.style.textShadow =
+        '0 2px 12px rgba(0,0,0,0.8), 0 0 60px rgba(0,255,100,0.5)';
+    }
+
     this.feedbackText.style.opacity = '1';
-    this.feedbackText.style.transform = 'translate(-50%, -50%) scale(1.1)';
+    this.feedbackText.style.transform = 'translate(-50%, -50%) scale(1.2)';
 
     requestAnimationFrame(() => {
       setTimeout(() => {
@@ -155,7 +169,8 @@ export class HUD {
       ? Math.round((this.hitCount / this.shotCount) * 100)
       : 0;
     this.scoreDisplay.innerHTML = `
-      <div style="font-size:1.4rem">${this.hitCount} / ${this.shotCount}</div>
+      <div style="font-size:0.8rem; color:#44ddaa; letter-spacing:1px;">SCORE</div>
+      <div style="font-size:2rem; line-height:1.1">${this.score}</div>
       <div style="font-size:0.8rem; opacity:0.7">${accuracy}% accuracy</div>
     `;
   }

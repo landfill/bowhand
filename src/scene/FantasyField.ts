@@ -11,6 +11,7 @@ export class FantasyField {
   init(scene: THREE.Scene): void {
     this.createSky(scene);
     this.createGround();
+    this.createMountains();
     this.createCastle();
     this.createTrees();
     this.createClouds();
@@ -19,18 +20,40 @@ export class FantasyField {
   }
 
   private createSky(scene: THREE.Scene): void {
-    // Gradient sky using fog
-    scene.fog = new THREE.FogExp2(0x87ceeb, 0.008);
-    scene.background = new THREE.Color(0x87ceeb);
+    // Bright daytime sky
+    scene.fog = new THREE.FogExp2(0x88ccff, 0.008);
+    scene.background = new THREE.Color(0x88ccff);
   }
 
   private createGround(): void {
-    const geometry = new THREE.PlaneGeometry(200, 200);
-    const material = new THREE.MeshLambertMaterial({ color: 0x4a7c3f });
+    const geometry = new THREE.PlaneGeometry(250, 250);
+    const material = new THREE.MeshLambertMaterial({ color: 0x55cc44 }); // very bright vibrant grass
     const ground = new THREE.Mesh(geometry, material);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = 0;
     this.group.add(ground);
+  }
+
+  private createMountains(): void {
+    const mntMat = new THREE.MeshLambertMaterial({ color: 0x4a8b62, flatShading: true }); // bright bluish-green mountains
+    
+    const mountGeo1 = new THREE.ConeGeometry(15, 45, 4); // sharp and narrow
+    const mount1 = new THREE.Mesh(mountGeo1, mntMat);
+    mount1.position.set(-45, 15, -80);
+    mount1.rotation.y = Math.PI / 6;
+    this.group.add(mount1);
+
+    const mountGeo2 = new THREE.ConeGeometry(20, 50, 5);
+    const mount2 = new THREE.Mesh(mountGeo2, mntMat);
+    mount2.position.set(0, 20, -90);
+    mount2.rotation.y = Math.PI / 4;
+    this.group.add(mount2);
+
+    const mountGeo3 = new THREE.ConeGeometry(12, 35, 4);
+    const mount3 = new THREE.Mesh(mountGeo3, mntMat);
+    mount3.position.set(50, 10, -75);
+    mount3.rotation.y = Math.PI / 3;
+    this.group.add(mount3);
   }
 
   private createCastle(): void {
@@ -38,7 +61,7 @@ export class FantasyField {
 
     // Main tower
     const towerGeo = new THREE.BoxGeometry(4, 12, 4);
-    const stoneMat = new THREE.MeshLambertMaterial({ color: 0x8b8b83 });
+    const stoneMat = new THREE.MeshLambertMaterial({ color: 0xaaaaa3 }); // bright stone
     const tower = new THREE.Mesh(towerGeo, stoneMat);
     tower.position.set(-15, 6, -40);
     castle.add(tower);
@@ -63,23 +86,27 @@ export class FantasyField {
     wall.position.set(-11.5, 4, -40);
     castle.add(wall);
 
+    // Some glowing windows
+    const winGeo = new THREE.PlaneGeometry(0.8, 1.5);
+    const winMat = new THREE.MeshBasicMaterial({ color: 0x66ccff }); // bright day window reflection
+    const win1 = new THREE.Mesh(winGeo, winMat);
+    win1.position.set(-15, 8, -37.9);
+    castle.add(win1);
+    const win2 = new THREE.Mesh(winGeo, winMat);
+    win2.position.set(-8, 8, -37.9);
+    castle.add(win2);
+
     this.group.add(castle);
   }
 
   private createTrees(): void {
-    const treeMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1e });
-    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6b4226 });
+    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x7b4226 }); // warm brown trunk
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x3d9a2e }); // bright green leaves
 
     const treePositions = [
-      { x: 6, z: -15 },
-      { x: -6, z: -18 },
-      { x: 10, z: -25 },
-      { x: 15, z: -30 },
-      { x: -10, z: -35 },
-      { x: -4, z: -12 },
-      { x: 20, z: -20 },
-      { x: -20, z: -28 },
-      { x: 8, z: -40 },
+      { x: 6, z: -15 }, { x: -6, z: -18 }, { x: 10, z: -25 },
+      { x: 15, z: -30 }, { x: -10, z: -35 }, { x: -4, z: -12 },
+      { x: 20, z: -20 }, { x: -20, z: -28 }, { x: 8, z: -40 },
       { x: -5, z: -45 },
     ];
 
@@ -87,19 +114,25 @@ export class FantasyField {
       const tree = new THREE.Group();
 
       // Trunk
-      const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 2, 6);
+      const trunkGeo = new THREE.CylinderGeometry(0.2, 0.4, 2, 5);
       const trunk = new THREE.Mesh(trunkGeo, trunkMat);
       trunk.position.y = 1;
       tree.add(trunk);
 
-      // Crown (cone)
-      const crownGeo = new THREE.ConeGeometry(1.5, 4, 6);
-      const crown = new THREE.Mesh(crownGeo, treeMat);
-      crown.position.y = 4;
-      tree.add(crown);
+      // Fluffy Leaves (multiple overlapping spheres)
+      const leafGeo = new THREE.SphereGeometry(1.2, 7, 7);
+      for (let i = 0; i < 3; i++) {
+        const leaf = new THREE.Mesh(leafGeo, leafMat);
+        leaf.position.set(
+          (Math.random() - 0.5) * 0.8,
+          2.5 + Math.random() * 0.8,
+          (Math.random() - 0.5) * 0.8
+        );
+        tree.add(leaf);
+      }
 
       // Random scale variation
-      const scale = 0.8 + Math.random() * 0.6;
+      const scale = 0.9 + Math.random() * 0.6;
       tree.scale.setScalar(scale);
       tree.position.set(pos.x, 0, pos.z);
       this.group.add(tree);
@@ -139,13 +172,18 @@ export class FantasyField {
   }
 
   private createLighting(scene: THREE.Scene): void {
-    // Sun (directional)
-    const sunLight = new THREE.DirectionalLight(0xfff4e0, 1.2);
-    sunLight.position.set(10, 20, -10);
+    // Bright sun
+    const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.5);
+    sunLight.position.set(20, 30, -10);
     scene.add(sunLight);
 
+    // Warm fill light
+    const fillLight = new THREE.DirectionalLight(0xddffff, 0.6);
+    fillLight.position.set(-20, 10, 20);
+    scene.add(fillLight);
+
     // Ambient
-    const ambient = new THREE.AmbientLight(0x6688cc, 0.5);
+    const ambient = new THREE.AmbientLight(0x7788aa, 0.7);
     scene.add(ambient);
   }
 
