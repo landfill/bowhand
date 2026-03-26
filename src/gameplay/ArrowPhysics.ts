@@ -13,6 +13,8 @@ export class ArrowPhysics extends EventTarget {
   private velocity = new THREE.Vector3();
   private isFlying = false;
   private lifetime = 0;
+  private trailGlow: THREE.Mesh | null = null;
+  private trailTimer = 0;
 
   init(scene: THREE.Scene, targets: Target[]): void {
     this.scene = scene;
@@ -53,6 +55,19 @@ export class ArrowPhysics extends EventTarget {
       group.add(fin);
     }
 
+    // Trail glow (simple stretched sphere)
+    const trailGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const trailMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+    });
+    this.trailGlow = new THREE.Mesh(trailGeo, trailMat);
+    this.trailGlow.position.z = 0.6;
+    this.trailGlow.scale.z = 10; // Stretch backwards
+    group.add(this.trailGlow);
+
     return group;
   }
 
@@ -66,6 +81,10 @@ export class ArrowPhysics extends EventTarget {
 
     this.arrowMesh.visible = true;
     this.arrowMesh.position.copy(this.position);
+
+    if (this.trailGlow) {
+      this.trailGlow.visible = true;
+    }
   }
 
   update(deltaTime: number): void {
@@ -95,9 +114,13 @@ export class ArrowPhysics extends EventTarget {
     for (let i = 0; i < this.targets.length; i++) {
       const result = this.targets[i].checkHit(raycaster);
       if (result.hit) {
+        // Move arrow precisely to the hit point for better visual
+        this.position.copy(result.position);
+        this.arrowMesh.position.copy(this.position);
+
         result.targetIndex = i;
         this.targets[i].onHit();
-        this.endFlight();
+        this.endFlight(true); // pass true for a hit!
         this.dispatchEvent(
           new CustomEvent('hit', { detail: result }),
         );
@@ -107,15 +130,30 @@ export class ArrowPhysics extends EventTarget {
 
     // Miss: arrow went below ground or exceeded lifetime
     if (this.position.y < -2 || this.lifetime > MAX_LIFETIME) {
-      this.endFlight();
+      this.endFlight(false);
       this.dispatchEvent(new CustomEvent('miss'));
     }
   }
 
-  private endFlight(): void {
+  private endFlight(isHit: boolean = false): void {
     this.isFlying = false;
+
+    // Hide trail immediately
+    if (this.trailGlow) {
+      this.trailGlow.visible = false;
+    }
+
     if (this.arrowMesh) {
-      this.arrowMesh.visible = false;
+      if (isHit) {
+        // Leave the arrow embedded in the target for a moment
+        setTimeout(() => {
+          if (!this.isFlying && this.arrowMesh) {
+            this.arrowMesh.visible = false;
+          }
+        }, 1000); // 1 second stick
+      } else {
+        this.arrowMesh.visible = false;
+      }
     }
   }
 

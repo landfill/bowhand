@@ -27,6 +27,7 @@ export interface TargetConfig {
   position: THREE.Vector3;
   radius: number;
   type: 'static' | 'floating';
+  isPenalty?: boolean; // Added for non-target characters
   floatAmplitude?: number;
   floatSpeed?: number;
   swayAmplitude?: number; // horizontal sway width
@@ -38,4 +39,5 @@ export interface HitResult {
   targetIndex: number;
   distance: number;
   position: THREE.Vector3;
+  isPenalty?: boolean; // True if it hit a non-target penalty
 }
